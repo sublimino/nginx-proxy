@@ -1,0 +1,16 @@
+[Unit]
+Description=nginx reverse proxy
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill nginx-proxy
+ExecStartPre=-/usr/bin/docker rm nginx-proxy
+# ExecStartPre=/usr/bin/docker build -t nginx-proxy /home/andy/src/nginx-proxy
+ExecStart=/usr/bin/docker run --name nginx-proxy -d -p 80:80 -e DEFAULT_HOST=www.binarysludge.com -v /var/run/docker.sock:/tmp/docker.sock benhall/nginx-proxy
+
+# ExecStop=/usr/bin/docker stop nginx-proxy
+
+[Install]
+WantedBy=multi-user.target

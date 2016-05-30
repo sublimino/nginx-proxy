@@ -2,15 +2,20 @@
 Description=nginx reverse proxy
 After=docker.service
 Requires=docker.service
+Requires=nginx-proxy-companion.service
 
 [Service]
 TimeoutStartSec=0
-ExecStartPre=-/usr/bin/docker kill nginx-proxy
-ExecStartPre=-/usr/bin/docker rm nginx-proxy
-# ExecStartPre=/usr/bin/docker build -t nginx-proxy /home/andy/src/nginx-proxy
-ExecStart=/usr/bin/docker run --name nginx-proxy -d -p 80:80 -e DEFAULT_HOST=www.binarysludge.com -v /var/run/docker.sock:/tmp/docker.sock jwilder/nginx-proxy
-
-# ExecStop=/usr/bin/docker stop nginx-proxy
+ExecStartPre=-/usr/bin/docker rm --force nginx-proxy
+ExecStart=/usr/bin/docker run --name nginx-proxy -p 80:80 -p 443:443 \
+    -e DEFAULT_HOST=www.binarysludge.com \
+    -v /home/andy/src/nginx-proxy/certs:/etc/nginx/certs:ro \
+    -v /home/andy/src/nginx-proxy/vhost.d:/etc/nginx/vhost.d \
+    -v /home/andy/src/nginx-proxy/html:/usr/share/nginx/html \
+    -v /var/run/docker.sock:/tmp/docker.sock \
+    -v /dev/log:/dev/log \
+    jwilder/nginx-proxy
+ExecStop=/usr/bin/docker stop nginx-proxy
 
 [Install]
 WantedBy=multi-user.target

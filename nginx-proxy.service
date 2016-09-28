@@ -9,14 +9,16 @@ TimeoutStartSec=0
 ExecStartPre=-/usr/bin/docker rm --force nginx-proxy
 ExecStart=/usr/bin/docker run --name nginx-proxy -p 80:80 -p 443:443 \
     -e DEFAULT_HOST=www.binarysludge.com \
-    -v /home/andy/src/nginx-proxy/extra.conf:/etc/nginx/conf.d/extra.conf:ro \
-    -v /home/andy/src/nginx-proxy/certs:/etc/nginx/certs:ro \
-    -v /home/andy/src/nginx-proxy/vhost.d:/etc/nginx/vhost.d \
-    -v /home/andy/src/nginx-proxy/html:/usr/share/nginx/html \
+    -v /home/ubuntu/src/nginx-proxy/extra.conf:/etc/nginx/conf.d/extra.conf:ro \
+    -v /home/ubuntu/src/nginx-proxy/certs:/etc/nginx/certs:ro \
+    -v /home/ubuntu/src/nginx-proxy/vhost.d:/etc/nginx/vhost.d \
+    -v /home/ubuntu/src/nginx-proxy/html:/usr/share/nginx/html \
     -v /var/run/docker.sock:/tmp/docker.sock \
     -v /dev/log:/dev/log \
     jwilder/nginx-proxy
 ExecStop=/usr/bin/docker stop nginx-proxy
+Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target

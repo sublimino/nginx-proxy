@@ -1,0 +1,23 @@
+[Unit]
+Description=nginx reverse proxy SSL companion
+After=docker.service
+After=nginx-proxy.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker rm --force nginx-proxy-companion
+
+ExecStart=/usr/bin/docker run --name nginx-proxy-companion \
+    -v /home/ubuntu/src/nginx-proxy/certs:/etc/nginx/certs:rw \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    -v /dev/log:/dev/log \
+    --volumes-from nginx-proxy \
+    nginxproxy/acme-companion
+
+ExecStop=/usr/bin/docker stop nginx-proxy-companion
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
